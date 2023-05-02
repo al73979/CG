@@ -1,0 +1,111 @@
+
+//Este código define o estilo da página, não tem margens
+<style>
+  body {
+    margin: 0;
+  }
+</style>
+
+//Importa o es-module-shims, que é um polyfill para importar módulos
+<script
+  async
+  src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
+></script>
+
+//Define o importmap, que é um arquivo que define os caminhos dos módulos
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+    }
+  }
+</script>
+
+ //Importa o módulo three e o OrbitControls
+<script type="module">
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+  //criar a cena, uma camara e um renderizador
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  )
+
+  const renderer = new THREE.WebGLRenderer()
+  renderer.shadowMap.enabled = true
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  document.body.appendChild(renderer.domElement)
+
+  //adicionar controles de orbita, que permite mover a camara
+  const controls = new OrbitControls(camera, renderer.domElement)
+
+  class Box extends THREE.Mesh {
+    constructor({width, height, depth, color = ' #00ff00'}) {
+      super(
+        new THREE.BoxGeometry(width,height, depth),
+        new THREE.MeshStandardMaterial({ color: color })
+      )
+      this.width = width
+      this.height = height
+      this.depth = depth
+    }
+  }
+
+
+
+  //criar um cubo e um chão
+
+  const cube = new Box ({
+    width: 1,
+    height:2,
+    depth: 1
+  })
+  // const geometry = new THREE.BoxGeometry(1, 1, 1)
+  // const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+  //const cube = new THREE.Mesh(geometry, material)
+  cube.castShadow = true // sombra
+  scene.add(cube)
+
+  const ground = new Box({
+    width: 5,
+    height: 0.5,
+    depth: 10,
+    color: '#0000ff'
+  })
+
+ 
+    ground.reciveShadow = true // não dá
+    ground.position.y = -2
+  scene.add(ground)
+
+  //luz ambiente
+  const light = new THREE.DirectionalLight(0xffffff,1)
+  light.position.y = 3
+  light.position.z = 2
+  light.castShadow = true
+  scene.add( light );
+  camera.position.z = 5
+
+  //luz ambiente
+  const light2 = new THREE.AmbientLight( 0x404040 ); // soft white light
+ scene.add( light2 );
+
+console.log(cube.height)
+
+//movimento do cubo
+  function animate() {
+    requestAnimationFrame(animate)
+    renderer.render(scene, camera)
+    // cube.position.y += -0.01
+    // cube.rotation.x += 0.01
+    // cube.rotation.y += 0.01
+  }
+  animate()
+</script>
+
+
